@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" />
+    <meta name="description" content="YCE Customer Management Utility" />
+</head>
+<body>
+    <h2>Yleana Customer Management Utility</h2>
+    @Scripts.Render("~/bundles/knockout")
+    @Scripts.Render("~/bundles/jquery")
+    @RenderSection("pagescripts", required: false)
+    @RenderSection("listsection", required: false)
+    @RenderSection("addsection", required: false)
+    @RenderBody()
+</body>
+    
+</html>

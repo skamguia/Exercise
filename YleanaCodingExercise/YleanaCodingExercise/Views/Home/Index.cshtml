@@ -1,0 +1,139 @@
+﻿@model YleanaCodingExercise.Models.Customer
+
+@{ 
+    ViewBag.Title = "Yleana Coding Exercise";
+}
+
+@section listsection {
+    <button data-bind="click: getCustomers">List Customers</button>
+
+    <h3>Customers</h3>
+    <table style="width: 100%; border: solid">
+        <thead style="border: thin">
+            <tr>
+                <th>Customer ID</th>
+                <th>Customer Name</th>
+                <th>Contact Name</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>Postal Code</th>
+                <th>Country</th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: Customers" style="border: thin">
+            <tr>
+                <td data-bind="text: CustomerID"></td>
+                <td data-bind="text: CustomerName"></td>
+                <td data-bind="text: ContactName"></td>
+                <td data-bind="text: Address"></td>
+                <td data-bind="text: City"></td>
+                <td data-bind="text: PostalCode"></td>
+                <td data-bind="text: Country"></td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@section addsection {
+    <h3>Add A Customer</h3>
+    <table id="add-a-customer-form">
+        <tr>
+            <td>Customer Name</td>
+            <td><input data-bind="value: CustomerName" /></td>
+            <td data-bind="validationMessage: 'Customer Name must be less than 60 characters.'"></td>
+        </tr>
+        <tr>
+            <td>Contact Name</td>
+            <td><input data-bind="value: ContactName" /></td>
+            <td data-bind="validationMessage: 'Contact Name must be less than 40 characters.'"></td>
+        </tr>
+        <tr>
+            <td>Address</td>
+            <td><input data-bind="value: Address" /></td>
+            <td data-bind="validationMessage: 'Address must be less than 60 characters.'"></td>
+        </tr>
+        <tr>
+            <td>City</td>
+            <td><input data-bind="value: City" /></td>
+            <td data-bind="validationMessage: 'City must be less than 60 characters.'"></td>
+        </tr>
+        <tr>
+            <td>Postal Code</td>
+            <td><input data-bind="value: PostalCode" /></td>
+            <td data-bind="validationMessage: 'Postal Code must be less than 20 characters.'"></td>
+        </tr>
+        <tr>
+            <td>Country</td>
+            <td><input data-bind="value: Country" /></td>
+            <td data-bind="validationMessage: 'Country must be less than 40 characters.'"></td>
+        </tr>
+    </table>
+    <button data-bind="click: addCustomer">Add Customer</button>
+}
+   
+
+@section pagescripts {
+    <script type="text/javascript">
+        $(function () {
+
+            var CustomersViewModel = function(data) {
+
+                var self = this;
+                self.Customers = ko.observableArray([]);
+
+                self.CustomerName = ko.observable().extend({ required: true, maxLength: 60 });
+                self.ContactName = ko.observable().extend({ required: true, maxLength: 40 });
+                self.Address = ko.observable().extend({ required: true, maxLength: 60 });
+                self.City = ko.observable().extend({ required: true, maxLength: 60 });
+                self.PostalCode = ko.observable().extend({ required: true, maxLength: 20 });
+                self.Country = ko.observable().extend({ required: true, maxLength: 40 });
+
+                self.getCustomers = function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("GetCustomers", "Home")",
+                        charset: "utf-8",
+                        datatype: 'json',
+                        contentType: "application/json"
+                    }).success(
+                        function (data) {
+                            ko.mapping.fromJS(data, {}, self.Customers);
+                        }).fail(
+                        function (jqXhr, textStatus, errorThrown) {
+                            alert('Error: (' + textStatus + ') ' + errorThrown);
+                        }
+                    );
+                };
+
+                self.addCustomer = function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("AddNewCustomer", "Home")",
+                        datatype: 'json',
+                        contentType: "application/json",
+                        data: ko.mapping.toJSON({
+                            CustomerName: self.CustomerName,
+                            ContactName: self.ContactName,
+                            Address: self.Address,
+                            City: self.City,
+                            PostalCode: self.PostalCode,
+                            Country: self.Country
+                        })
+                    }).done(
+                        function (data) {
+                            data = ko.toJS(data);
+                        }
+                    ).fail(
+                        function (jqXhr, textStatus, errorThrown) {
+                            alert('Error: (' + textStatus + ') ' + errorThrown);
+                        }
+                    );
+                };
+            }
+
+            ko.applyBindings(new CustomersViewModel());
+
+        })
+        
+    </script>
+}
